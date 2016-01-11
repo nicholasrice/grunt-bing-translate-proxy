@@ -8,43 +8,28 @@
 
 'use strict';
 
+var chalk = require('chalk');
+
 module.exports = function(grunt) {
 
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
 
   grunt.registerMultiTask('bing_translate_proxy', 'Local proxy server to request translations from using Bing Translate API', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
-        }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+    var options = this.options();
+    options.protocol = options.protocol || 'http:';
+    options.domain = options.domain || 'localhost';
+    options.port = options.port || 8080;
 
-      // Handle options.
-      src += options.punctuation;
+    if (options.client_id === undefined) {
+      return new Error(chalk.red("client_id is not defined"));
+    }
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+    if (options.client_secret === undefined) {
+      return new Error(chalk.red("client_secret is not defined"));
+    }
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
-    });
+    
   });
-
 };
