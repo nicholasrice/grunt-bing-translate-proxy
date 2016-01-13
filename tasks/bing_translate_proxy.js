@@ -185,14 +185,13 @@ module.exports = function(grunt) {
         //--------------------------------------------------------------------------
         // Proxy Server Setup
         //--------------------------------------------------------------------------
-        var PORT = options.port;
         var server = http.createServer(handleRequest);
 
         //--------------------------------------------------------------------------
         // Start server
         //--------------------------------------------------------------------------
-        server.listen(PORT, function() {
-          console.log(chalk.green("Bing translate proxy started"), PORT); // TODO lets make this more relevant
+        server.listen(options.port, function() {
+          console.log(chalk.green("Bing translate proxy started at: " + options.protocol + "//" + options.domain + ':' + options.port)); // TODO lets make this more relevant
         });
 
         if (! validAccessToken()) {
