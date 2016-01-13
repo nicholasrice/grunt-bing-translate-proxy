@@ -26,11 +26,10 @@ In your project's Gruntfile, add a section named `bing_translate_proxy` to the d
 grunt.initConfig({
   bing_translate_proxy: {
     options: {
+        client_id: [your_client_id],
+        client_secret: [your_client_secret]
       // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+    }
   },
 });
 ```
