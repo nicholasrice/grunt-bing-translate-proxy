@@ -18,7 +18,7 @@ var chalk = require('chalk'),
 
 module.exports = function(grunt) {
     grunt.registerMultiTask('bing_translate_proxy', 'Local proxy server to request translations from using Bing Translate API', function() {
-        var done = this.async(); // Tell grunt to keep task running until canceled
+        var done = null;
         var tempStorage = ".grunt/grunt-bing-translate-proxy/";
         var parser = new xml2js.Parser();
 
@@ -30,6 +30,10 @@ module.exports = function(grunt) {
         options.domain = options.domain || 'localhost';
         options.port = options.port || 8080;
 
+        if (options.keepalive === true) {
+            done = this.async();
+        }
+        
         if (options.client_id === undefined) {
             return new Error(chalk.red("client_id is not defined"));
         }
