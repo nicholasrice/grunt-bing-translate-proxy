@@ -1,7 +1,7 @@
 'use strict';
 
 var grunt = require('grunt');
-
+var http = require('http');
 /*
   ======== A Handy Little Nodeunit Reference ========
   https://github.com/caolan/nodeunit
@@ -23,13 +23,22 @@ var grunt = require('grunt');
 */
 
 exports.bing_translate_proxy = {
-  setUp: function(done) {
-    // setup here if necessary
-    done();
-  },
-  default_options: function(test) {
-    
+    setUp: function(done) {
+        // setup here if necessary
+        done();
+    },
+    default_options: function(test) {
+        test.expect(1);
 
-    test.done();
-  }
+        http.get('http://localhost:8080', function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function(chunk) {
+                test.strictEqual(typeof chunk, 'string', 'Result should be a string');
+                test.done();
+            });
+        }).on('error', function(e) {
+            console.log('Got error: ' + e.message);
+            test.done();
+        });
+    }
 };
