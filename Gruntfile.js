@@ -28,14 +28,19 @@ module.exports = function(grunt) {
       tests: ['tmp']
     },
 
+    watch: {
+        default: {
+            files: ['**/*.js'],
+            tasks: ['default']
+        }
+    },
+
     // Configuration to be run (and then tested).
     bing_translate_proxy: {
-      default: {
+      default_options: {
         options: {
-          domain: 'localhost',
-          port: 9001,
-          client_id: '[client id]',
-          client_secret: '[client secret]'
+          client_id: 'client_id',
+          client_secret: 'client_secret'
         }
       }
     },
@@ -54,12 +59,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
   grunt.registerTask('test', ['clean', 'bing_translate_proxy', 'nodeunit']);
 
   // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint', 'test']);
+  grunt.registerTask('default', ['jshint', 'test', 'watch']);
 
 };
