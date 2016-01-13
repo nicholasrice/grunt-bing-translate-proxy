@@ -39,8 +39,8 @@ module.exports = function(grunt) {
     bing_translate_proxy: {
       default_options: {
         options: {
-          client_id: 'client_id',
-          client_secret: 'client_secret'
+          client_id: '[client_id]',
+          client_secret: '[client_secret]'
         }
       }
     },
