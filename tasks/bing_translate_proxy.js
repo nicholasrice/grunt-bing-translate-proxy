@@ -64,7 +64,7 @@ module.exports = function(grunt) {
                 console.log("to or from is null");
                 response.statusCode = 404;
                 response.statusMessage = 'either the "to" or "from" paramater was not interpreted correctly.';
-                response.write("Error");
+                response.write("Error: \n" + response.statusMessage);
                 response.end();
 
                 return null;
@@ -118,7 +118,11 @@ module.exports = function(grunt) {
                             return new Error(err);
                         }
 
-                        callback(data.string._);
+                        if (data.string._ !== undefined) {
+                            callback(data.string._);
+                        } else {
+                            return new Error(data);
+                        }
                     });
                 });
             });
