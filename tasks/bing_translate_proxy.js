@@ -33,7 +33,7 @@ module.exports = function(grunt) {
         if (options.keepalive === true) {
             done = this.async();
         }
-        
+
         if (options.client_id === undefined) {
             return new Error(chalk.red("client_id is not defined"));
         }
@@ -46,19 +46,23 @@ module.exports = function(grunt) {
         // Proxy entry function
         //--------------------------------------------------------------------------
         function handleRequest(request, response) {
-            if (! validAccessToken()) {
-                requestTranslateAccessToken();
-            }
-
             var text = "Today I went to the store to buy groceries",
                 from = "en",
                 to = "de";
 
-            requestTranslation(text, from, to, function(translation) {
+            function respond(translation) {
                 response.statusCode = 200; // TODO is this true?
                 response.write(translation);
                 response.end();
-            });
+            }
+
+            if (! validAccessToken()) {
+                requestTranslateAccessToken(function() {
+                    requestTranslation(text, from, to, respond);
+                });
+            } else {
+                requestTranslation(text, from, to, respond);
+            }
         }
 
         function requestTranslation(text, from, to, callback) {
@@ -88,7 +92,7 @@ module.exports = function(grunt) {
                         if (err) {
                             return new Error(err);
                         }
-
+                        console.log(data);
                         callback(data.string._);
                     });
                 });
