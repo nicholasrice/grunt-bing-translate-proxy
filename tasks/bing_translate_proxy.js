@@ -13,7 +13,8 @@ var chalk = require('chalk'),
     http = require('http'),
     https = require('https'),
     querystring = require('querystring'),
-    xml2js = require('xml2js');
+    xml2js = require('xml2js'),
+    url = require('url');
 
 
 module.exports = function(grunt) {
@@ -46,27 +47,51 @@ module.exports = function(grunt) {
         // Proxy entry function
         //--------------------------------------------------------------------------
         function handleRequest(request, response) {
-            var text = "Today I went to the store to buy groceries",
-                from = "en",
-                to = "de";
+            var url_parts = url.parse(request.url, true);
+            var text = url_parts.query.text ? url_parts.query.text : "";
+            var to = url_parts.query.to ? url_parts.query.to : null;
+            var from = url_parts.query.from ? url_parts.query.from : null;
 
-            function respond(translation) {
-                response.statusCode = 200; // TODO is this true?
+            function returnTranslation(translation) {
+                response.writeHead(200, {
+                  'Content-Length': Buffer.byteLength(translation),
+                  'Content-Type': 'text/plain' });
                 response.write(translation);
                 response.end();
             }
 
+            if (to === null || from === null) {
+                console.log("to or from is null");
+                response.statusCode = 404;
+                response.statusMessage = 'either the "to" or "from" paramater was not interpreted correctly.';
+                response.write("Error");
+                response.end();
+
+                return null;
+            }
+
+            if (text === "") {
+                response.writeHead(200, {
+                  'Content-Length': text.length,
+                  'Content-Type': 'text/plain' });
+                response.write(text);
+                response.end();
+
+                return text;
+            }
+
             if (! validAccessToken()) {
                 requestTranslateAccessToken(function() {
-                    requestTranslation(text, from, to, respond);
+                    requestTranslation(text, from, to, returnTranslation);
                 });
             } else {
-                requestTranslation(text, from, to, respond);
+                requestTranslation(text, from, to, returnTranslation);
             }
+
+            return text;
         }
 
         function requestTranslation(text, from, to, callback) {
-            // TODO make sure we have all of these arguments
             var path = querystring.stringify({
                 "text": text,
                 "from": encodeURIComponent(from),
@@ -92,7 +117,7 @@ module.exports = function(grunt) {
                         if (err) {
                             return new Error(err);
                         }
-                        console.log(data);
+
                         callback(data.string._);
                     });
                 });
@@ -167,7 +192,7 @@ module.exports = function(grunt) {
         // Start server
         //--------------------------------------------------------------------------
         server.listen(PORT, function() {
-          console.log("Server listening on: http://localhost:%s", PORT); // TODO lets make this more relevant
+          console.log(chalk.green("Bing translate proxy started"), PORT); // TODO lets make this more relevant
         });
 
         if (! validAccessToken()) {
