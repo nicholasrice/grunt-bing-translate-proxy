@@ -30,27 +30,19 @@ module.exports = function(grunt) {
 
     // Configuration to be run (and then tested).
     bing_translate_proxy: {
-      default_options: {
+      default: {
         options: {
-        },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!'
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
+          domain: 'localhost',
+          port: 9001,
+          client_id: '[client id]',
+          client_secret: '[client secret]'
         }
       }
     },
 
     // Unit tests.
     nodeunit: {
-      // tests: ['test/*_test.js']
+      tests: ['test/*_test.js']
     }
 
   });
@@ -65,7 +57,7 @@ module.exports = function(grunt) {
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', 'bing_translate_proxy']);
+  grunt.registerTask('test', ['clean', 'bing_translate_proxy', 'nodeunit']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test']);
