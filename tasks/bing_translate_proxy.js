@@ -46,8 +46,6 @@ module.exports = function(grunt) {
                 requestTranslateAccessToken();
             }
 
-            console.log(request);
-            
             var text = "Today I went to the store to buy groceries",
                 from = "en",
                 to = "de";
