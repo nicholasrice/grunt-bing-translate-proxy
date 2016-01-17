@@ -54,8 +54,10 @@ module.exports = function(grunt) {
 
             function returnTranslation(translation) {
                 response.writeHead(200, {
-                  'Content-Length': Buffer.byteLength(translation),
-                  'Content-Type': 'text/plain' });
+                    'Content-Length': Buffer.byteLength(translation),
+                    'Content-Type': 'text/plain',
+                    'Access-Control-Allow-Origin': '*'
+                });
                 response.write(translation);
                 response.end();
             }
