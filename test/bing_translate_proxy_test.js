@@ -48,12 +48,42 @@ exports.bing_translate_proxy = {
 
             res.on('data', function(chunk) {
                 test.strictEqual(typeof chunk, 'string', 'Result should be a string');
-                console.log(chunk);
                 test.done();
             });
         }).on('error', function(e) {
             console.log('Got error: ' + e.message);
             test.done();
         });
+    },
+    high_volume: function(test) {
+        var volume = 200;
+        var counter = 0;
+        test.expect(volume * 2);
+
+        var path = querystring.stringify({
+            to: to,
+            from: from,
+            text: "a"
+        });
+
+        for (var i = 0; i < volume; i++) {
+            http.get('http://localhost:8080?' + path, function(res) {
+                var index = i;
+                res.setEncoding('utf8');
+
+                test.strictEqual(res.statusCode, 200, 'Status code should be 200');
+
+                res.on('data', function(chunk) {
+                    test.strictEqual(typeof chunk, 'string', 'Result should be a string');
+                    counter++;
+                    if (counter === volume) {
+                        test.done();
+                    }
+                });
+            }).on('error', function(e) {
+                console.log('Got error: ' + e.message);
+                test.done();
+            });
+        }
     }
 };
