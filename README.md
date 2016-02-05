@@ -37,13 +37,13 @@ grunt.initConfig({
 Once the server is running, you can retrieve translations of strings with a `GET` request pointed at your server hostname and port. Eg:
 `http://0.0.0.0:8080?text=Hello%20World&to=de&from=en&method=Translate`.
 
-#### text
+#### text __Required__
 The Text to be translated.
 
-#### to
+#### to  __Required__
 The language that the text is being translated to.
 
-#### from
+#### from  __Required__
 The language that the text is being translated from.
 
 #### method
@@ -51,38 +51,38 @@ The Bing Translate API method to use. Currently only `'Translate'` and `'Transla
 
 ### Options
 #### options.client_id
-Type: `string` __Required__
-Default Value: __N/A__
+Type: `string` __Required__  
+Default Value: __N/A__  
 
 This is the `client id` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
 
 #### options.client_secret
-Type: `string` __Required__
-Default Value: __N/A__
+Type: `string` __Required__  
+Default Value: __N/A__  
 
 This is the `client secret` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
 
 #### options.port
-Type: `integer`
-Default Value: `8080`
+Type: `integer`  
+Default Value: `8080`  
 
 The port that the server can be reached at. This task will fail if the port is already in use.
 
 #### options.protocol
-Type: `String`
-Default value: `'http'`
+Type: `String`  
+Default value: `'http'`  
 
 Supports `'http'`, `'https'` protocols.
 
 #### options.hostname
-Type: `String`
-Default value: `'0.0.0.0'`
+Type: `String`  
+Default value: `'0.0.0.0'`  
 
 The hostname that the server can be reached at.
 
 #### options.keepalive
-Type: `Boolean`
-Default value: `false`
+Type: `Boolean`  
+Default value: `false`  
 
 Keep the server alive until canceled.
 
