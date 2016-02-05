@@ -21,14 +21,17 @@ module.exports = function(grunt) {
     grunt.registerMultiTask('bing_translate_proxy', 'Local proxy server to request translations from using Bing Translate API', function() {
         var done = null;
         var tempStorage = ".grunt/grunt-bing-translate-proxy/";
-        var parser = new xml2js.Parser();
+        var parser = new xml2js.Parser({
+            charkey: "_"
+        });
+        var server = null;
 
         //--------------------------------------------------------------------------
         // Define config requirements and defaults
         //--------------------------------------------------------------------------
         var options = this.options();
         options.protocol = options.protocol || 'http:';
-        options.domain = options.domain || 'localhost';
+        options.hostname = options.domain || '0.0.0.0';
         options.port = options.port || 8080;
 
         if (options.keepalive === true) {
@@ -48,9 +51,6 @@ module.exports = function(grunt) {
         //--------------------------------------------------------------------------
         function handleRequest(request, response) {
             var url_parts = url.parse(request.url, true);
-            var text = url_parts.query.text ? url_parts.query.text : "";
-            var to = url_parts.query.to ? url_parts.query.to : null;
-            var from = url_parts.query.from ? url_parts.query.from : null;
 
             function returnTranslation(translation) {
                 response.writeHead(200, {
@@ -62,7 +62,16 @@ module.exports = function(grunt) {
                 response.end();
             }
 
-            if (to === null || from === null) {
+            var options = {
+                text: url_parts.query.text ? url_parts.query.text : "",
+                to: url_parts.query.to ? url_parts.query.to : null,
+                from: url_parts.query.from ? url_parts.query.from : null,
+                method: url_parts.query.method ? url_parts.query.method : "Translate",
+                callback: returnTranslation
+            };
+
+
+            if (options.to === null || options.from === null) {
                 console.log("to or from is null");
                 response.statusCode = 404;
                 response.statusMessage = 'either the "to" or "from" paramater was not interpreted correctly.';
@@ -72,32 +81,23 @@ module.exports = function(grunt) {
                 return null;
             }
 
-            if (text === "") {
-                response.writeHead(200, {
-                  'Content-Length': text.length,
-                  'Content-Type': 'text/plain' });
-                response.write(text);
-                response.end();
-
-                return text;
-            }
-
             if (! validAccessToken()) {
                 requestTranslateAccessToken(function() {
-                    requestTranslation(text, from, to, returnTranslation);
+                    requestTranslation(options);
                 });
             } else {
-                requestTranslation(text, from, to, returnTranslation);
+                requestTranslation(options);
             }
-
-            return text;
         }
 
-        function requestTranslation(text, from, to, callback) {
+        //--------------------------------------------------------------------------
+        // Send requst for translation
+        //--------------------------------------------------------------------------
+        function requestTranslation(options) {
             var path = querystring.stringify({
-                "text": text,
-                "from": encodeURIComponent(from),
-                "to": encodeURIComponent(to)
+                "from": encodeURIComponent(options.from),
+                "text": options.text,
+                "to": encodeURIComponent(options.to)
             });
 
             var authToken = "Bearer " + grunt.file.readJSON(tempStorage + "translate-access-token.json").access_token;
@@ -105,23 +105,29 @@ module.exports = function(grunt) {
             var req_options = {
                 protocol: 'http:',
                 host: 'api.microsofttranslator.com',
-                path: "/v2/Http.svc/Translate?" + path,
-                method: "GET",
+                path: '/v2/Http.svc/' + options.method + '?' + path,
+                method: 'GET',
                 headers: {
                     "Authorization": authToken
                 }
             };
 
             var request = http.request(req_options, function(res) {
+                var response = '';
+
                 res.setEncoding('utf8');
                 res.on('data', function(chunk) {
-                    parser.parseString(chunk, function(err, data) {
+                    response += chunk;
+                });
+
+                res.on('end', function() {
+                    parser.parseString(response, function(err, data) {
                         if (err) {
                             return new Error(err);
                         }
 
                         if (data.string._ !== undefined) {
-                            callback(data.string._);
+                            options.callback(data.string._);
                         } else {
                             return new Error(data);
                         }
@@ -131,6 +137,7 @@ module.exports = function(grunt) {
 
             request.end();
         }
+
         //--------------------------------------------------------------------------
         // Determine if access token exists and is valid
         //--------------------------------------------------------------------------
@@ -191,13 +198,24 @@ module.exports = function(grunt) {
         //--------------------------------------------------------------------------
         // Proxy Server Setup
         //--------------------------------------------------------------------------
-        var server = http.createServer(handleRequest);
+
+        switch (options.protocol) {
+            case "https:":
+                server = https.createServer(handleRequest);
+                break
+            default:
+                server = http.createServer(handleRequest);
+        }
+
 
         //--------------------------------------------------------------------------
         // Start server
         //--------------------------------------------------------------------------
-        server.listen(options.port, function() {
-          console.log(chalk.green("Bing translate proxy started at: " + options.protocol + "//" + options.domain + ':' + options.port)); // TODO lets make this more relevant
+        server.listen({
+            host: options.hostname,
+            port: options.port
+        }, function() {
+            console.log(chalk.green("Bing translate proxy started at: " + options.protocol + "//" + options.hostname + ':' + options.port));
         });
 
         if (! validAccessToken()) {

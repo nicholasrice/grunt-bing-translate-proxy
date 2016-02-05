@@ -55,7 +55,30 @@ exports.bing_translate_proxy = {
             test.done();
         });
     },
-    high_volume: function(test) {
+    default_array: function(test) {
+        test.expect(2);
+
+        var path = querystring.stringify({
+            to: to,
+            from: from,
+            text: '["hello world", "I\'m going to the moon"]'
+        });
+
+        http.get('http://localhost:8080?' + path, function(res) {
+            res.setEncoding('utf8');
+
+            test.strictEqual(res.statusCode, 200, 'Status code should be 200');
+
+            res.on('data', function(chunk) {
+                test.strictEqual(typeof chunk, 'string', 'Result should be a string');
+                test.done();
+            });
+        }).on('error', function(e) {
+            console.log('Got error: ' + e.message);
+            test.done();
+        });
+    },
+    default_high_volume: function(test) {
         var volume = 200;
         var counter = 0;
         test.expect(volume * 2);
@@ -63,7 +86,7 @@ exports.bing_translate_proxy = {
         var path = querystring.stringify({
             to: to,
             from: from,
-            text: "a"
+            text: "Hello world"
         });
 
         for (var i = 0; i < volume; i++) {
@@ -85,5 +108,35 @@ exports.bing_translate_proxy = {
                 test.done();
             });
         }
-    }
+    },
+    default_high_volume_array: function(test) {
+        test.expect(2);
+
+        var path = querystring.stringify({
+            to: to,
+            from: from,
+            text: (function() {
+                var strings = [];
+                for (var i = 0; i < 400; i++) {
+                    strings.push("Hello world");
+                }
+
+                return '[' + strings.toString() + ']';
+            })()
+        });
+
+        http.get('http://localhost:8080?' + path, function(res) {
+            res.setEncoding('utf8');
+
+            test.strictEqual(res.statusCode, 200, 'Status code should be 200');
+
+            res.on('data', function(chunk) {
+                test.strictEqual(typeof chunk, 'string', 'Result should be a string');
+                test.done();
+            });
+        }).on('error', function(e) {
+            console.log('Got error: ' + e.message);
+            test.done();
+        });
+    },
 };
