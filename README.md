@@ -34,50 +34,89 @@ grunt.initConfig({
 });
 ```
 
+Once the server is running, you can retrieve translations of strings with a `GET` request pointed at your server hostname and port. Eg:
+`http://0.0.0.0:8080?text=Hello%20World&to=de&from=en&method=Translate`.
+
+#### text
+The Text to be translated.
+
+#### to
+The language that the text is being translated to.
+
+#### from
+The language that the text is being translated from.
+
+#### method
+The Bing Translate API method to use. Currently only `'Translate'` and `'TranslateArray'` methods. Please see [https://msdn.microsoft.com/en-us/library/ff512422.aspx](https://msdn.microsoft.com/en-us/library/ff512422.aspx) for more information on these methods.
+
 ### Options
+#### options.client_id
+Type: `string` __Required__
+Default Value: __N/A__
 
-#### options.separator
+This is the `client id` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
+
+#### options.client_secret
+Type: `string` __Required__
+Default Value: __N/A__
+
+This is the `client secret` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
+
+#### options.port
+Type: `integer`
+Default Value: `8080`
+
+The port that the server can be reached at. This task will fail if the port is already in use.
+
+#### options.protocol
 Type: `String`
-Default value: `',  '`
+Default value: `'http'`
 
-A string value that is used to do something with whatever.
+Supports `'http'`, `'https'` protocols.
 
-#### options.punctuation
+#### options.hostname
 Type: `String`
-Default value: `'.'`
+Default value: `'0.0.0.0'`
 
-A string value that is used to do something else with whatever else.
+The hostname that the server can be reached at.
+
+#### options.keepalive
+Type: `Boolean`
+Default value: `false`
+
+Keep the server alive until canceled.
 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
-
-```js
-grunt.initConfig({
-  bing_translate_proxy: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+In this example, `grunt bing_translate_proxy` will start a static web server at `http://0.0.0.0:8080`.
 
 ```js
 grunt.initConfig({
   bing_translate_proxy: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+      client_id: 'your_client_id',
+      client_secret: 'your_client_id'
+    }
   },
+  ...
+});
+```
+
+#### Custom Options
+In this example, `grunt bing_translate_proxy` will start a static web server at `http://localhost:9001`.
+
+```js
+grunt.initConfig({
+  bing_translate_proxy: {
+    options: {
+      client_id: 'your_client_id',
+      client_secret: 'your_client_id',
+      protocol: 9001,
+      hostname: 'localhost'
+    }
+  },
+  ...
 });
 ```
 
