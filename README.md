@@ -81,13 +81,13 @@ bing_translate_proxy: {
 ```
 
 #### options.auth_location
-Type: `string`
+Type: `string`  
 Default Value: __N/A__
 
 If you would like to store your authentication tokens in a file other than `.bing-translate-credentials`, you can specify a file-path here.
 
 #### options.client_id
-Type: `string`
+Type: `string`  
 Default Value: __N/A__  
 
 This is the `client id` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
