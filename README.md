@@ -50,14 +50,50 @@ The language that the text is being translated from.
 The Bing Translate API method to use. Currently only `'Translate'` and `'TranslateArray'` methods. Please see [https://msdn.microsoft.com/en-us/library/ff512422.aspx](https://msdn.microsoft.com/en-us/library/ff512422.aspx) for more information on these methods.
 
 ### Options
+#### options.auth_key
+Type: `string`
+Default Value: __N/A__  
+
+This points to a JSON object at the root of a `.bing-translate-credentials` file at the root of the project (or a file specefied by the `config.auth_location` option). Example:
+```
+// gruntfile.js
+bing_translate_proxy: {
+  default: {
+    options: {
+      auth_key: "key-1"
+    }
+  }
+}
+```
+
+```
+// .bing-translate-credentials
+{
+    "key-1": {
+        "client_id": "[client_id_1]",
+        "client_secret": "[client_secret_1]"
+    },
+    "key-2": {
+        "client_id": "[client_id_1]",
+        "client_secret": "[client_secret_1]"
+    }
+}
+```
+
+#### options.auth_location
+Type: `string`
+Default Value: __N/A__
+
+If you would like to store your authentication tokens in a file other than `.bing-translate-credentials`, you can specify a file-path here.
+
 #### options.client_id
-Type: `string` __Required__  
+Type: `string`
 Default Value: __N/A__  
 
 This is the `client id` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.
 
 #### options.client_secret
-Type: `string` __Required__  
+Type: `string`
 Default Value: __N/A__  
 
 This is the `client secret` provided to you by the Bing API service. See [https://www.microsoft.com/en-us/translator/getstarted.aspx](https://www.microsoft.com/en-us/translator/getstarted.aspx) for details on how to get this.

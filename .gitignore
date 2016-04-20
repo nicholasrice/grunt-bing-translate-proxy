@@ -3,3 +3,4 @@ npm-debug.log
 tmp
 .grunt
 .DS_Store
+.bing-translate-credentials
