@@ -19,31 +19,67 @@ var chalk = require('chalk'),
 
 module.exports = function(grunt) {
     grunt.registerMultiTask('bing_translate_proxy', 'Local proxy server to request translations from using Bing Translate API', function() {
-        var done = null;
-        var tempStorage = ".grunt/grunt-bing-translate-proxy/";
-        var parser = new xml2js.Parser({
-            charkey: "_"
-        });
-        var server = null;
+        var done = null,
+            tempStorage = ".grunt/grunt-bing-translate-proxy/",
+            parser = new xml2js.Parser({
+                charkey: "_"
+            }),
+            server = null,
+            authTokenString = null,
+            authTokens = null,
+            options = null;
 
         //--------------------------------------------------------------------------
         // Define config requirements and defaults
         //--------------------------------------------------------------------------
-        var options = this.options();
+        options = this.options();
         options.protocol = options.protocol || 'http:';
         options.hostname = options.domain || '0.0.0.0';
         options.port = options.port || 8080;
+        options.auth = {
+            client_id:      null,
+            client_secret:  null
+        };
 
         if (options.keepalive === true) {
             done = this.async();
         }
 
-        if (options.client_id === undefined) {
-            return new Error(chalk.red("client_id is not defined"));
+        // check if we're using auth_key.
+        if (typeof options.auth_key !== 'undefined') {
+            options.auth_location = options.auth_location || '.bing-translate-credentials';
+
+            authTokenString = grunt.file.read(options.auth_location, {encoding: "utf-8"});
+            authTokens = JSON.parse(authTokenString);
+
+            // If we can find our client_id and client_secret, then pass them to
+            // our auth object
+            if (authTokens[options.auth_key]['client_id']) {
+                options.auth.client_id = authTokens[options.auth_key]['client_id'];
+            }
+
+            if (authTokens[options.auth_key]['client_secret']) {
+                options.auth.client_secret = authTokens[options.auth_key]['client_secret'];
+            }
         }
 
-        if (options.client_secret === undefined) {
-            return new Error(chalk.red("client_secret is not defined"));
+        // If client_id or client_secret exist they should take precedence over
+        // other other credentials
+        if (typeof options.client_id !== 'undefined') {
+            options.auth.client_id = options.client_id;
+        }
+
+        if (typeof options.client_secret !== 'undefined') {
+            options.auth.client_secret = options.client_secret;
+        }
+
+        // Verify that we have valid auth tokens. If we don't we need to fail
+        if (options.auth.client_id === null) {
+            grunt.fail.fatal(chalk.red('No client_id found. Ensure you a passing a valid client_id to', this.name));
+        }
+
+        if (options.auth.client_secret === null) {
+            grunt.fail.fatal(chalk.red('No client_secret found. Ensure you a passing a valid client_id to', this.name));
         }
 
         //--------------------------------------------------------------------------
@@ -72,7 +108,6 @@ module.exports = function(grunt) {
 
 
             if (options.to === null || options.from === null) {
-                console.log("to or from is null");
                 response.statusCode = 404;
                 response.statusMessage = 'either the "to" or "from" paramater was not interpreted correctly.';
                 response.write("Error: \n" + response.statusMessage);
@@ -158,8 +193,8 @@ module.exports = function(grunt) {
         //--------------------------------------------------------------------------
         function requestTranslateAccessToken(callback) {
             var post_data = querystring.stringify({
-                "client_id": options.client_id,
-                "client_secret": options.client_secret,
+                "client_id": options.auth.client_id,
+                "client_secret": options.auth.client_secret,
                 "scope": "http://api.microsofttranslator.com",
                 "grant_type": "client_credentials"
             });
