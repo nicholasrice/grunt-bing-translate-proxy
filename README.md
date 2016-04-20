@@ -54,7 +54,7 @@ The Bing Translate API method to use. Currently only `'Translate'` and `'Transla
 Type: `string`
 Default Value: __N/A__  
 
-This points to a JSON object at the root of a `.bing-translate-credentials` file at the root of the project (or a file specefied by the `config.auth_location` option). Example:
+This points to a JSON object at the root of a `.bing-translate-credentials` file at the root of the project (or a file specified by the `config.auth_location` option). Example:
 ```
 // gruntfile.js
 bing_translate_proxy: {
