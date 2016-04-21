@@ -148,7 +148,7 @@ grunt.initConfig({
     options: {
       client_id: 'your_client_id',
       client_secret: 'your_client_id',
-      protocol: 9001,
+      port: 9001,
       hostname: 'localhost'
     }
   },
