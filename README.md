@@ -108,7 +108,7 @@ The port that the server can be reached at. This task will fail if the port is a
 Type: `String`  
 Default value: `'http'`  
 
-Supports `'http'`, `'https'` protocols.
+Supports `'http:'`, `'https:'` protocols.
 
 #### options.hostname
 Type: `String`  
