@@ -8,8 +8,7 @@
 
 'use strict';
 
-var chalk = require('chalk'),
-    fs = require('fs'),
+var fs = require('fs'),
     http = require('http'),
     https = require('https'),
     querystring = require('querystring'),
@@ -75,11 +74,11 @@ module.exports = function(grunt) {
 
         // Verify that we have valid auth tokens. If we don't we need to fail
         if (options.auth.client_id === null) {
-            grunt.fail.fatal(chalk.red('No client_id found. Ensure you a passing a valid client_id to', this.name));
+            grunt.fail.fatal('No client_id found. Ensure you a passing a valid client_id to', this.name);
         }
 
         if (options.auth.client_secret === null) {
-            grunt.fail.fatal(chalk.red('No client_secret found. Ensure you a passing a valid client_id to', this.name));
+            grunt.fail.fatal('No client_secret found. Ensure you a passing a valid client_id to', this.name);
         }
 
         //--------------------------------------------------------------------------
@@ -250,7 +249,7 @@ module.exports = function(grunt) {
             host: options.hostname,
             port: options.port
         }, function() {
-            console.log(chalk.green("Bing translate proxy started at: " + options.protocol + "//" + options.hostname + ':' + options.port));
+            grunt.log.ok("Bing translate proxy started at: " + options.protocol + "//" + options.hostname + ':' + options.port);
         });
 
         if (! validAccessToken()) {
